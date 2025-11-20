@@ -1,0 +1,38 @@
+# Scrapy
+*.pyc
+__pycache__/
+.scrapy/
+
+# Output files
+output/*.csv
+output/*.json
+output/*.xml
+output/*.txt
+
+# Debug files
+debug/*.html
+debug/*.png
+debug/*.jpg
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# ChromeDriver cache
+chromedriver
+.wdm/
