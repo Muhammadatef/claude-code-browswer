@@ -1,0 +1,16 @@
+# Etisalat Scraper Dependencies
+
+# Core Scrapy framework
+Scrapy>=2.11.0
+
+# Selenium for JavaScript rendering
+selenium>=4.15.0
+
+# WebDriver manager for automatic ChromeDriver installation
+webdriver-manager>=4.0.0
+
+# Data processing
+pandas>=2.0.0
+
+# Optional: Enhanced browser automation
+undetected-chromedriver>=3.5.0
