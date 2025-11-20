@@ -61,11 +61,17 @@ async def main() -> None:
             url = context.request.url
             Actor.log.info(f'Scraping {url}...')
 
-            # Wait for the page to load completely
-            await context.page.wait_for_load_state('networkidle')
+            try:
+                # Wait for the page to load completely with timeout
+                await context.page.wait_for_load_state('networkidle', timeout=30000)
+                Actor.log.info('Page loaded successfully')
 
-            # Wait a bit more for dynamic content to render
-            await context.page.wait_for_timeout(3000)
+                # Wait a bit more for dynamic content to render
+                await context.page.wait_for_timeout(5000)
+                Actor.log.info('Dynamic content wait completed')
+            except Exception as e:
+                Actor.log.error(f'Error waiting for page to load: {e}')
+                return
 
             # Determine Main_Group based on URL
             main_group = None
@@ -95,15 +101,6 @@ async def main() -> None:
             except Exception as e:
                 Actor.log.warning(f'Could not extract group: {e}')
 
-            # Take a screenshot for debugging
-            try:
-                screenshot_path = f'screenshot_{url.split("/")[-1]}.png'
-                await context.page.screenshot(path=screenshot_path, full_page=True)
-                await Actor.push_data({'debug_screenshot': screenshot_path, 'url': url})
-                Actor.log.info(f'Screenshot saved: {screenshot_path}')
-            except Exception as e:
-                Actor.log.warning(f'Could not take screenshot: {e}')
-
             # Try multiple selectors to find plan cards
             plan_cards = []
             selectors_to_try = [
@@ -128,16 +125,32 @@ async def main() -> None:
             # If no plan cards found, log page structure for debugging
             if len(plan_cards) == 0:
                 try:
-                    page_title = await context.page.title()
-                    Actor.log.warning(f'No plan cards found! Page title: {page_title}')
+                    # Check if page is still open
+                    if not context.page.is_closed():
+                        page_title = await context.page.title()
+                        Actor.log.warning(f'No plan cards found! Page title: {page_title}')
 
-                    # Get all unique class names on the page
-                    all_classes = await context.page.eval_on_selector_all(
-                        '[class]',
-                        '(elements) => Array.from(new Set(elements.flatMap(el => Array.from(el.classList))))'
-                    )
-                    Actor.log.info(f'Found {len(all_classes)} unique CSS classes on page')
-                    Actor.log.info(f'Sample classes: {all_classes[:20]}')
+                        # Get all unique class names on the page
+                        all_classes = await context.page.eval_on_selector_all(
+                            '[class]',
+                            '(elements) => Array.from(new Set(elements.flatMap(el => Array.from(el.classList))))'
+                        )
+                        Actor.log.info(f'Found {len(all_classes)} unique CSS classes on page')
+                        Actor.log.info(f'Sample classes: {all_classes[:20]}')
+
+                        # Try to get page HTML for analysis
+                        page_html = await context.page.content()
+                        Actor.log.info(f'Page HTML length: {len(page_html)} characters')
+
+                        # Save a debug screenshot only when no cards found
+                        try:
+                            screenshot_path = f'debug_nocards_{url.split("/")[-1]}.png'
+                            await context.page.screenshot(path=screenshot_path, full_page=False)
+                            Actor.log.info(f'Debug screenshot saved: {screenshot_path}')
+                        except Exception as ss_err:
+                            Actor.log.debug(f'Could not save screenshot: {ss_err}')
+                    else:
+                        Actor.log.error('Page was closed unexpectedly!')
                 except Exception as e:
                     Actor.log.error(f'Error inspecting page structure: {e}')
 
@@ -306,26 +319,15 @@ async def main() -> None:
                     continue
 
             # Try to find and click on different tabs/groups to get all plans
-            try:
-                tabs = await context.page.query_selector_all('.v-tab')
-                Actor.log.info(f'Found {len(tabs)} tabs on the page')
-
-                for i, tab in enumerate(tabs):
-                    try:
-                        # Check if tab is not already active
-                        tab_classes = await tab.get_attribute('class')
-                        if 'v-tab--active' not in tab_classes:
-                            Actor.log.info(f'Clicking tab {i+1}')
-                            await tab.click()
-                            await context.page.wait_for_timeout(2000)
-
-                            # After clicking, re-run extraction for new plans
-                            # This is a simplified approach; you might want to extract this into a function
-                            Actor.log.info('Tab clicked, waiting for content to load...')
-                    except Exception as e:
-                        Actor.log.warning(f'Could not click tab {i+1}: {e}')
-            except Exception as e:
-                Actor.log.warning(f'Could not process tabs: {e}')
+            # Skip this for now to avoid page closure issues
+            if not context.page.is_closed():
+                try:
+                    tabs = await context.page.query_selector_all('.v-tab')
+                    Actor.log.info(f'Found {len(tabs)} tabs on the page')
+                    # Note: Tab clicking disabled to prevent page closure issues
+                    # Will be re-enabled after fixing the selector issues
+                except Exception as e:
+                    Actor.log.warning(f'Could not query tabs: {e}')
 
         # Run the crawler with the starting requests.
         await crawler.run(urls)
