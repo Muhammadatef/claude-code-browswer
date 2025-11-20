@@ -41,6 +41,11 @@ async def main() -> None:
         # The input schema returns URLs as [{'url': '...'}, ...] but crawler expects plain strings
         urls = [url.get('url') if isinstance(url, dict) else url for url in start_urls]
 
+        # Log all URLs that will be crawled
+        Actor.log.info(f'Will crawl {len(urls)} URLs:')
+        for i, u in enumerate(urls, 1):
+            Actor.log.info(f'  {i}. {u}')
+
         # Create a crawler.
         crawler = PlaywrightCrawler(
             max_requests_per_crawl=50,
@@ -90,10 +95,51 @@ async def main() -> None:
             except Exception as e:
                 Actor.log.warning(f'Could not extract group: {e}')
 
-            # Find all plan cards on the page
-            plan_cards = await context.page.query_selector_all('.v-card, [class*="plan-card"]')
+            # Take a screenshot for debugging
+            try:
+                screenshot_path = f'screenshot_{url.split("/")[-1]}.png'
+                await context.page.screenshot(path=screenshot_path, full_page=True)
+                await Actor.push_data({'debug_screenshot': screenshot_path, 'url': url})
+                Actor.log.info(f'Screenshot saved: {screenshot_path}')
+            except Exception as e:
+                Actor.log.warning(f'Could not take screenshot: {e}')
+
+            # Try multiple selectors to find plan cards
+            plan_cards = []
+            selectors_to_try = [
+                '.v-card',  # Vuetify card component
+                '[class*="plan-card"]',  # Any class containing "plan-card"
+                '[class*="PlanCard"]',  # Capitalized version
+                '[class*="product-card"]',  # Alternative naming
+                '[data-testid*="plan"]',  # Test ID attributes
+                'article',  # Semantic HTML
+                '.card',  # Bootstrap-style cards
+            ]
+
+            for selector in selectors_to_try:
+                elements = await context.page.query_selector_all(selector)
+                if elements:
+                    Actor.log.info(f'Found {len(elements)} elements with selector: {selector}')
+                    plan_cards = elements
+                    break
 
             Actor.log.info(f'Found {len(plan_cards)} plan cards on {url}')
+
+            # If no plan cards found, log page structure for debugging
+            if len(plan_cards) == 0:
+                try:
+                    page_title = await context.page.title()
+                    Actor.log.warning(f'No plan cards found! Page title: {page_title}')
+
+                    # Get all unique class names on the page
+                    all_classes = await context.page.eval_on_selector_all(
+                        '[class]',
+                        '(elements) => Array.from(new Set(elements.flatMap(el => Array.from(el.classList))))'
+                    )
+                    Actor.log.info(f'Found {len(all_classes)} unique CSS classes on page')
+                    Actor.log.info(f'Sample classes: {all_classes[:20]}')
+                except Exception as e:
+                    Actor.log.error(f'Error inspecting page structure: {e}')
 
             for card in plan_cards:
                 try:
