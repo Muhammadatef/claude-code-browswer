@@ -37,6 +37,10 @@ async def main() -> None:
             Actor.log.info('No start URLs specified in Actor input, exiting...')
             await Actor.exit()
 
+        # Extract URL strings from the start_urls dictionaries
+        # The input schema returns URLs as [{'url': '...'}, ...] but crawler expects plain strings
+        urls = [url.get('url') if isinstance(url, dict) else url for url in start_urls]
+
         # Create a crawler.
         crawler = PlaywrightCrawler(
             max_requests_per_crawl=50,
@@ -278,7 +282,7 @@ async def main() -> None:
                 Actor.log.warning(f'Could not process tabs: {e}')
 
         # Run the crawler with the starting requests.
-        await crawler.run(start_urls)
+        await crawler.run(urls)
 
 
 if __name__ == '__main__':
