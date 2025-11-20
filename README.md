@@ -20,8 +20,11 @@ The Actor accepts the following input parameters:
 
 ### start_urls (array)
 List of URLs to scrape. By default, it scrapes:
-- https://du.ae/personal/mobile/postpaid
-- https://du.ae/personal/mobile/prepaid
+- https://shop.du.ae/en/personal/postpaid/emirati-plans
+- https://shop.du.ae/en/personal/s-du-postpaid-plans
+- https://shop.du.ae/en/personal/s-du-metallic-plans?showLoader=true
+- https://shop.du.ae/en/personal/s-du-prepaid-flexi-plans
+- https://shop.du.ae/en/personal/s-du-prepaid-easy-plans
 
 You can customize these URLs or add additional ones.
 
@@ -33,10 +36,19 @@ Example input:
 {
   "start_urls": [
     {
-      "url": "https://du.ae/personal/mobile/postpaid"
+      "url": "https://shop.du.ae/en/personal/postpaid/emirati-plans"
     },
     {
-      "url": "https://du.ae/personal/mobile/prepaid"
+      "url": "https://shop.du.ae/en/personal/s-du-postpaid-plans"
+    },
+    {
+      "url": "https://shop.du.ae/en/personal/s-du-metallic-plans?showLoader=true"
+    },
+    {
+      "url": "https://shop.du.ae/en/personal/s-du-prepaid-flexi-plans"
+    },
+    {
+      "url": "https://shop.du.ae/en/personal/s-du-prepaid-easy-plans"
     }
   ],
   "headless": true
@@ -86,7 +98,7 @@ Example output:
   "GTIN_Code": null,
   "UAE_GTIN": null,
   "EAN_Code": null,
-  "Source_URL": "https://du.ae/personal/mobile/postpaid"
+  "Source_URL": "https://shop.du.ae/en/personal/s-du-postpaid-plans"
 }
 ```
 

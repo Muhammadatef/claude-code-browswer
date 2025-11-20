@@ -24,8 +24,11 @@ async def main() -> None:
         start_urls = actor_input.get(
             'start_urls',
             [
-                {'url': 'https://du.ae/personal/mobile/postpaid'},
-                {'url': 'https://du.ae/personal/mobile/prepaid'},
+                {'url': 'https://shop.du.ae/en/personal/postpaid/emirati-plans'},
+                {'url': 'https://shop.du.ae/en/personal/s-du-postpaid-plans'},
+                {'url': 'https://shop.du.ae/en/personal/s-du-metallic-plans?showLoader=true'},
+                {'url': 'https://shop.du.ae/en/personal/s-du-prepaid-flexi-plans'},
+                {'url': 'https://shop.du.ae/en/personal/s-du-prepaid-easy-plans'},
             ],
         )
 
