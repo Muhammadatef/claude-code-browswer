@@ -1,0 +1,70 @@
+{
+  "actorSpecification": 1,
+  "name": "du-plans-scraper",
+  "title": "du Mobile Plans Scraper",
+  "description": "Scrapes postpaid and prepaid mobile plans from du.ae website with detailed plan information including prices, benefits, and commitments.",
+  "version": "1.0.0",
+  "meta": {
+    "templateId": "python-playwright"
+  },
+  "input": "./.actor/input_schema.json",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "categories": [
+    "ECOMMERCE"
+  ],
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "du Mobile Plans",
+      "description": "Dataset containing scraped du mobile plans with detailed information",
+      "views": {
+        "overview": {
+          "title": "Overview",
+          "transformation": {
+            "fields": [
+              "Name",
+              "Description",
+              "Price_Actual",
+              "Price_Original",
+              "Discount",
+              "Main_Group",
+              "Group",
+              "Commitment"
+            ]
+          },
+          "display": {
+            "component": "table"
+          }
+        },
+        "full": {
+          "title": "Full Details",
+          "transformation": {
+            "fields": [
+              "Name",
+              "Description",
+              "Price_Actual",
+              "Price_Original",
+              "Discount",
+              "Main_Group",
+              "Group",
+              "Benefit_1",
+              "Benefit_2",
+              "Benefit_3",
+              "Benefit_4",
+              "Benefit_5",
+              "Commitment",
+              "GTIN_Code",
+              "UAE_GTIN",
+              "EAN_Code",
+              "Source_URL"
+            ]
+          },
+          "display": {
+            "component": "table"
+          }
+        }
+      }
+    }
+  }
+}

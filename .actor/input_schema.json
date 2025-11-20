@@ -1,0 +1,37 @@
+{
+  "title": "du Plans Scraper Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "start_urls": {
+      "title": "Start URLs",
+      "type": "array",
+      "description": "List of URLs to scrape. Default includes du postpaid and prepaid plan pages.",
+      "editor": "requestListSources",
+      "default": [
+        {
+          "url": "https://du.ae/personal/mobile/postpaid"
+        },
+        {
+          "url": "https://du.ae/personal/mobile/prepaid"
+        }
+      ],
+      "prefill": [
+        {
+          "url": "https://du.ae/personal/mobile/postpaid"
+        },
+        {
+          "url": "https://du.ae/personal/mobile/prepaid"
+        }
+      ]
+    },
+    "headless": {
+      "title": "Headless mode",
+      "type": "boolean",
+      "description": "Run browser in headless mode. Set to false for debugging.",
+      "default": true,
+      "editor": "checkbox"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,8 @@
+# Apify SDK for Python
+apify~=2.0.0
+
+# Crawlee - the web scraping and browser automation library
+crawlee[playwright]~=0.3.0
+
+# Additional dependencies for robust scraping
+playwright>=1.40.0
