@@ -123,7 +123,26 @@ class EtisalatCompleteSpider(scrapy.Spider):
                 row = {field: item.get(field, '') or '' for field in self.csv_headers}
                 self.csv_writer.writerow(row)
                 self.csv_file.flush()  # CRITICAL: Flush immediately after each write
-                self.logger.info(f"              💾 ✅ WRITTEN TO CSV: {item.get('Name', 'Unknown')}")
+
+                # Log complete item as dictionary
+                self.logger.info(f"              💾 ✅ WRITTEN TO CSV - Plan #{self.plans_extracted}: {item.get('Name', 'Unknown')}")
+
+                # Compact summary
+                summary = {
+                    'name': row['Name'],
+                    'link': row['Link'],
+                    'price': row['Price_Actual'],
+                    'group': row['Group'],
+                    'speed': row['Speed'],
+                    'local_data': row['Local_Data'],
+                    'minutes': row['Minutes']
+                }
+                self.logger.info(f"              📝 SUMMARY: {json.dumps(summary, ensure_ascii=False)}")
+
+                # Full detailed data
+                self.logger.info(f"\n              📋 COMPLETE ROW DATA:")
+                self.logger.info(f"              {json.dumps(row, indent=4, ensure_ascii=False)}\n")
+
                 return True
             else:
                 self.logger.error(f"              ❌ CSV writer not initialized")
