@@ -33,9 +33,14 @@ DOWNLOADER_MIDDLEWARES = {
 }
 
 # Configure item pipelines
-# ITEM_PIPELINES = {
-#    'eand.pipelines.EandPipeline': 300,
-# }
+ITEM_PIPELINES = {
+    'eand.pipelines.EandCleaningPipeline': 100,
+    'eand.pipelines.EandValidationPipeline': 200,
+    'eand.pipelines.EandDeduplicationPipeline': 300,
+}
+
+# Feed export settings - write each item immediately
+FEED_EXPORT_BATCH_ITEM_COUNT = 1  # Write each item immediately (no batching)
 
 # Enable and configure the AutoThrottle extension
 AUTOTHROTTLE_ENABLED = True
